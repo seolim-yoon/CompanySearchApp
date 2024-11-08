@@ -25,6 +25,7 @@ object NetworkModule {
     @Provides
     fun providesNetworkJson(): Json = Json {
         ignoreUnknownKeys = true
+        coerceInputValues = true
     }
 
     @Singleton
@@ -33,8 +34,8 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
-                    .addHeader("wanted-client-id", OPEN_API_CLIENT_SECRET)
-                    .addHeader("wanted-client-secret", OPEN_API_CLIENT_ID)
+                    .addHeader("wanted-client-id", OPEN_API_CLIENT_ID)
+                    .addHeader("wanted-client-secret", OPEN_API_CLIENT_SECRET)
                     .build()
                 chain.proceed(request)
             }
@@ -52,8 +53,8 @@ object NetworkModule {
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(contentType))
+            .client(okHttpClient)
             .build()
     }
 
