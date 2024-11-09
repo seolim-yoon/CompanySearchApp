@@ -9,12 +9,12 @@ class SearchCompanyUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         keyword: String,
-        page: Int,
-        pageSize: Int
+        offset: Int,
+        limit: Int
     ): CompanyListEntity =
         companyRepository.searchCompany(
             keyword = keyword,
-            page = page,
-            pageSize = pageSize
+            offset = offset,
+            limit = limit
         )
 }

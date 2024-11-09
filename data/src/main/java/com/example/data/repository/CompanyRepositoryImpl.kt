@@ -11,8 +11,8 @@ class CompanyRepositoryImpl @Inject constructor(
     private val companyRemoteDataSource: CompanyRemoteDataSource,
     private val companyEntityMapper: CompanyEntityMapper
 ): CompanyRepository {
-    override suspend fun searchCompany(keyword: String, page: Int, pageSize: Int): CompanyListEntity =
-        companyEntityMapper.mapToCompanyListEntity(companyRemoteDataSource.searchCompany(keyword = keyword, page = page, pageSize = pageSize))
+    override suspend fun searchCompany(keyword: String, offset: Int, limit: Int): CompanyListEntity =
+        companyEntityMapper.mapToCompanyListEntity(companyRemoteDataSource.searchCompany(keyword = keyword, offset = offset, limit = limit))
 
     override suspend fun getCompanyDetail(companyId: Int): CompanyDetailEntity =
         companyEntityMapper.mapToCompanyDetailEntity(companyRemoteDataSource.getCompanyDetail(companyId = companyId))

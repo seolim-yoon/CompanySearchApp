@@ -8,8 +8,8 @@ import javax.inject.Inject
 class CompanyRemoteDataSourceImpl @Inject constructor(
     private val companyServiceApi: CompanyServiceApi
 ) : CompanyRemoteDataSource {
-    override suspend fun searchCompany(keyword: String, page: Int, pageSize: Int): CompanyListDTO =
-        companyServiceApi.searchCompany(keyword = keyword, page = page, pageSize = pageSize)
+    override suspend fun searchCompany(keyword: String, offset: Int, limit: Int): CompanyListDTO =
+        companyServiceApi.searchCompany(keyword = keyword, offset = offset, limit = limit)
 
     override suspend fun getCompanyDetail(companyId: Int): CompanyDetailDTO =
         companyServiceApi.getCompanyDetail(companyId = companyId)
