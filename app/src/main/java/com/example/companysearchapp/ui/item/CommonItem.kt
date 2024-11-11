@@ -9,11 +9,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
+import com.example.companysearchapp.R
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 internal fun AsyncImageItem(
     imgUrl: String,
+    contentScale: ContentScale,
     modifier: Modifier = Modifier
 ) {
     if (LocalInspectionMode.current) {
@@ -26,7 +29,8 @@ internal fun AsyncImageItem(
         GlideImage(
             model = imgUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = contentScale,
+            failure = placeholder(R.drawable.ic_launcher_foreground),
             modifier = modifier
         )
     }

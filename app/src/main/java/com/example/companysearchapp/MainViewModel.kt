@@ -1,45 +1,35 @@
 package com.example.companysearchapp
 
 import com.example.companysearchapp.base.BaseViewModel
+import com.example.companysearchapp.base.UiState
 import com.example.companysearchapp.mapper.CompanyUiModelMapper
 import com.example.companysearchapp.uimodel.CompanyUiModel
 import com.example.companysearchapp.util.PAGE_SIZE
 import com.example.domain.usecase.SearchCompanyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-
-sealed interface MainLoadState {
-    data object Loading : MainLoadState
-    data class Success(val companyList: List<CompanyUiModel>) : MainLoadState
-    data class Error(val error: Throwable) : MainLoadState
-}
+data class MainUiState(
+    val mainLoadState: MainLoadState = LoadState.Success(listOf())
+) : UiState
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val searchCompanyUseCase: SearchCompanyUseCase,
     private val companyUiModelMapper: CompanyUiModelMapper
-) : BaseViewModel() {
-    private val _uiState: MutableStateFlow<MainLoadState> =
-        MutableStateFlow(MainLoadState.Success(companyList = listOf()))
-    val uiState = _uiState.asStateFlow()
+) : BaseViewModel<MainUiState>() {
 
     private var currentPage = 0
     private var currentKeyword = ""
 
-    init {
-    }
+    override fun createInitialState(): MainUiState = MainUiState()
 
     private fun searchCompanyByKeyword(
         keyword: String
     ) {
-        _uiState.update {
-            MainLoadState.Loading
+        setState {
+            copy(mainLoadState = LoadState.Loading)
         }
-
         viewModelLaunch(onSuccess = {
             currentPage = 0
             currentKeyword = keyword
@@ -52,11 +42,13 @@ class MainViewModel @Inject constructor(
                 )
             ).companyList
 
-            _uiState.update {
-                MainLoadState.Success(
-                    companyList = mutableListOf<CompanyUiModel>().apply {
-                        addAll(searchResult)
-                    }
+            setState {
+                copy(
+                    mainLoadState = LoadState.Success(
+                        mutableListOf<CompanyUiModel>().apply {
+                            addAll(searchResult)
+                        }
+                    )
                 )
             }
         })
@@ -73,23 +65,26 @@ class MainViewModel @Inject constructor(
             ).companyList
 
             if (moreCompanyList.isNotEmpty()) {
-                _uiState.update {
-                    if (it is MainLoadState.Success) {
-                        MainLoadState.Success(
-                            companyList = it.companyList.toMutableList().apply {
-                                addAll(moreCompanyList)
-                            }
+                setState {
+                    (currentState.mainLoadState as? LoadState.Success)?.let { successState ->
+                        copy(
+                            mainLoadState = LoadState.Success(
+                                successState.data.toMutableList().apply {
+                                    addAll(moreCompanyList)
+                                }
+                            )
                         )
-
-                    } else it
+                    } ?: currentState
                 }
             }
         })
     }
 
     override fun handleException(throwable: Throwable) {
-        _uiState.update {
-            MainLoadState.Error(throwable)
+        setState {
+            copy(
+                mainLoadState = LoadState.Error(throwable)
+            )
         }
     }
 

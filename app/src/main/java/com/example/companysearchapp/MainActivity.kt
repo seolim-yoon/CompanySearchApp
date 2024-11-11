@@ -16,11 +16,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CompanySearchAppTheme {
-                val navController = rememberNavController()
-
-                NavHostScreen(
-                    navController = navController
-                )
+                NavHostScreen()
             }
         }
     }

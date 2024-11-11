@@ -23,7 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import com.example.companysearchapp.MainLoadState
+import com.example.companysearchapp.LoadState
+import com.example.companysearchapp.MainUiState
 import com.example.companysearchapp.R
 import com.example.companysearchapp.ui.item.CompanyItem
 import com.example.companysearchapp.ui.item.SearchBarItem
@@ -31,10 +32,11 @@ import com.example.companysearchapp.uimodel.CompanyUiModel
 
 @Composable
 internal fun MainScreen(
-    loadState: MainLoadState,
+    uiState: MainUiState,
     onSearchCompany: (String) -> Unit,
     onClickCompanyItem: (CompanyUiModel) -> Unit,
-    loadMoreItem: () -> Unit
+    loadMoreItem: () -> Unit,
+    onRefresh: () -> Unit
 ) {
     var keyword by remember { mutableStateOf("") }
 
@@ -56,10 +58,12 @@ internal fun MainScreen(
             )
 
             CompanyList(
-                loadState = loadState,
+                uiState = uiState,
                 onClickCompanyItem = onClickCompanyItem,
-                loadMoreItem = loadMoreItem,
-                onRefresh = { }
+                loadMoreItem = {
+                    loadMoreItem()
+                },
+                onRefresh = onRefresh
             )
         }
     }
@@ -68,7 +72,7 @@ internal fun MainScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun CompanyList(
-    loadState: MainLoadState,
+    uiState: MainUiState,
     onClickCompanyItem: (CompanyUiModel) -> Unit,
     loadMoreItem: () -> Unit,
     onRefresh: () -> Unit
@@ -88,13 +92,13 @@ internal fun CompanyList(
         }
     }
 
-    when (loadState) {
-        is MainLoadState.Loading -> {
+    when (uiState.mainLoadState) {
+        is LoadState.Loading -> {
             LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        is MainLoadState.Success -> {
+        is LoadState.Success -> {
             CompositionLocalProvider(LocalOverscrollConfiguration provides null)  {
                 LazyColumn(
                     state = listState,
@@ -104,7 +108,7 @@ internal fun CompanyList(
                 ) {
                     items(
                         key = { it.id },
-                        items = loadState.companyList
+                        items = uiState.mainLoadState.data
                     ) { company ->
                         CompanyItem(
                             company = company,
@@ -114,9 +118,9 @@ internal fun CompanyList(
                 }
             }
         }
-        is MainLoadState.Error -> {
+        is LoadState.Error -> {
             ErrorScreen(
-                errorMessage = loadState.error.message.toString(),
+                errorMessage = uiState.mainLoadState.error.message.toString(),
                 onRefresh = onRefresh
             )
         }

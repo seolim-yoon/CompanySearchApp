@@ -6,16 +6,7 @@ data class CompanyUiModelList(
 )
 data class CompanyUiModel(
     val id: Int,
-    val logoUrl: ImageUrl,
+    val logoImg: ImageUiModel,
     val title: String,
-    val description: String,
-    val companyImageUrl: List<ImageUrl>,
-    val url: String
-) {
-    data class ImageUrl(
-        val id: Int = 0,
-        val isTitle: Boolean = false,
-        val origin: String,
-        val thumbnail: String
-    )
-}
+    val description: String
+)

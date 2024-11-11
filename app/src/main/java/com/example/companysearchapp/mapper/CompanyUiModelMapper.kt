@@ -2,6 +2,8 @@ package com.example.companysearchapp.mapper
 
 import com.example.companysearchapp.uimodel.CompanyUiModel
 import com.example.companysearchapp.uimodel.CompanyUiModelList
+import com.example.companysearchapp.uimodel.DetailCompanyUiModel
+import com.example.companysearchapp.uimodel.ImageUiModel
 import com.example.domain.entity.CompanyEntity
 import com.example.domain.entity.CompanyListEntity
 import javax.inject.Inject
@@ -15,22 +17,19 @@ class CompanyUiModelMapper @Inject constructor() {
             next = companyList.links.next
         )
 
-    fun mapToCompanyUiModel(company: CompanyEntity): CompanyUiModel =
+    private fun mapToCompanyUiModel(company: CompanyEntity): CompanyUiModel =
         company.run {
             CompanyUiModel(
                 id = id,
-                logoUrl = mapToLogoImages(logoUrl),
+                logoImg = mapToLogoImages(logoImg),
                 title = name,
-                description = description,
-                companyImageUrl = mapToCompanyImages(images),
-                url = url
-
+                description = description
             )
         }
 
-    private fun mapToLogoImages(image: CompanyEntity.ImageEntity): CompanyUiModel.ImageUrl =
+    private fun mapToLogoImages(image: CompanyEntity.ImageEntity): ImageUiModel =
         image.run {
-            CompanyUiModel.ImageUrl(
+            ImageUiModel(
                 id = id,
                 isTitle = isTitle,
                 origin = origin,
@@ -38,9 +37,9 @@ class CompanyUiModelMapper @Inject constructor() {
             )
         }
 
-    private fun mapToCompanyImages(images: List<CompanyEntity.ImageEntity>): List<CompanyUiModel.ImageUrl> =
+    private fun mapToCompanyImages(images: List<CompanyEntity.ImageEntity>): List<ImageUiModel> =
         images.map { image ->
-            CompanyUiModel.ImageUrl(
+            ImageUiModel(
                 id = image.id,
                 isTitle = image.isTitle,
                 origin = image.origin,
@@ -48,4 +47,15 @@ class CompanyUiModelMapper @Inject constructor() {
             )
         }
 
+    fun mapToDetailCompanyUiModel(company: CompanyEntity): DetailCompanyUiModel =
+        company.run {
+            DetailCompanyUiModel(
+                id = id,
+                logoUrl = mapToLogoImages(logoUrl),
+                title = name,
+                description = description,
+                companyImageUrl = mapToCompanyImages(images),
+                url = url
+            )
+        }
 }
