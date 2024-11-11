@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 data class MainUiState(
+    val isEnd: Boolean = false,
     val mainLoadState: MainLoadState = LoadState.Success(listOf())
 ) : UiState
 
@@ -30,47 +31,60 @@ class MainViewModel @Inject constructor(
         setState {
             copy(mainLoadState = LoadState.Loading)
         }
-        viewModelLaunch(onSuccess = {
-            currentPage = 0
-            currentKeyword = keyword
+        if (keyword.isNotEmpty()) {
+            viewModelLaunch(onSuccess = {
+                currentPage = 0
+                currentKeyword = keyword
 
-            val searchResult = companyUiModelMapper.mapToCompanyListUiModel(
-                searchCompanyUseCase(
-                    keyword = keyword,
-                    offset = currentPage * PAGE_SIZE,
-                    limit = PAGE_SIZE
+                val searchResult = companyUiModelMapper.mapToCompanyListUiModel(
+                    searchCompanyUseCase(
+                        keyword = keyword,
+                        offset = currentPage * PAGE_SIZE,
+                        limit = PAGE_SIZE
+                    )
                 )
-            ).companyList
 
+                setState {
+                    copy(
+                        isEnd = searchResult.next.isEmpty(),
+                        mainLoadState = LoadState.Success(
+                            mutableListOf<CompanyUiModel>().apply {
+                                addAll(searchResult.companyList)
+                            }
+                        )
+                    )
+                }
+            })
+        } else {
             setState {
                 copy(
                     mainLoadState = LoadState.Success(
-                        mutableListOf<CompanyUiModel>().apply {
-                            addAll(searchResult)
-                        }
+                        emptyList()
                     )
                 )
             }
-        })
+        }
     }
 
     private fun loadMoreCompanyList(page: Int) {
         viewModelLaunch(onSuccess = {
-            val moreCompanyList = companyUiModelMapper.mapToCompanyListUiModel(
+
+            val loadMoreResult = companyUiModelMapper.mapToCompanyListUiModel(
                 searchCompanyUseCase(
                     keyword = currentKeyword,
                     offset = page * PAGE_SIZE,
                     limit = PAGE_SIZE
                 )
-            ).companyList
+            )
 
-            if (moreCompanyList.isNotEmpty()) {
+            if (loadMoreResult.companyList.isNotEmpty()) {
                 setState {
                     (currentState.mainLoadState as? LoadState.Success)?.let { successState ->
                         copy(
+                            isEnd = loadMoreResult.next.isEmpty(),
                             mainLoadState = LoadState.Success(
                                 successState.data.toMutableList().apply {
-                                    addAll(moreCompanyList)
+                                    addAll(loadMoreResult.companyList)
                                 }
                             )
                         )

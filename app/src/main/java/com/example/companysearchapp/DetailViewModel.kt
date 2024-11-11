@@ -31,7 +31,7 @@ class DetailViewModel @Inject constructor(
 
             setState {
                 copy(
-                    detailLoadState =   LoadState.Success(
+                    detailLoadState = LoadState.Success(
                         detailInfo
                     )
                 )

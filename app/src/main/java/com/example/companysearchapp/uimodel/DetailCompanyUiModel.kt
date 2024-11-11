@@ -7,5 +7,6 @@ data class DetailCompanyUiModel(
     val title: String,
     val description: String,
     val companyImageUrl: List<ImageUiModel>,
+    val link: String,
     val url: String
 )

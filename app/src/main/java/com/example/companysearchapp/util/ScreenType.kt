@@ -7,7 +7,5 @@ sealed interface ScreenType {
     data object MainScreen: ScreenType
 
     @Serializable
-    data class DetailScreen(
-        val companyId: Int
-    ): ScreenType
+    data object DetailScreen: ScreenType
 }

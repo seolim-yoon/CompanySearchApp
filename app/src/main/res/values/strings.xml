@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">CompanySearchApp</string>
     <string name="search_place_holder">검색어를 입력하세요.</string>
+    <string name="empty_view_message">\"%s\"의 결과가 없어요. \n 다시 검색어를 입력하세요.</string>
     <string name="refresh">새로고침</string>
-
+    <string name="str_link">Link : </string>
+    <string name="str_url">Url : </string>
 </resources>

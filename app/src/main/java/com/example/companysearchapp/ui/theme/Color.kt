@@ -17,11 +17,13 @@ val Pink40 = Color(0xFF7D5260)
 val Gray = Color(0xFF121212)
 val LightGray = Color(0xFF6B6B72)
 val White = Color(0xFFFFFFFF)
+val Blue = Color(0xFF0E46B3)
 
 class CompanyColorScheme(
     gray: Color = Gray,
     lightGray: Color = LightGray,
-    white: Color = White
+    white: Color = White,
+    blue: Color = Blue
 ) {
     var gray by mutableStateOf(gray)
         private set
@@ -32,20 +34,26 @@ class CompanyColorScheme(
     var white by mutableStateOf(white)
         private set
 
+    var blue by mutableStateOf(blue)
+        private set
+
     fun copy(
         gray: Color = this.gray,
         lightGray: Color = this.lightGray,
-        white: Color = this.white
+        white: Color = this.white,
+        blue: Color = this.blue
     ) = CompanyColorScheme(
         gray = gray,
         lightGray = lightGray,
-        white = white
+        white = white,
+        blue = blue
     )
 
     fun updateColorsFrom(other: CompanyColorScheme) {
         gray = other.gray
         lightGray = other.lightGray
         white = other.white
+        blue = other.blue
     }
 }
 

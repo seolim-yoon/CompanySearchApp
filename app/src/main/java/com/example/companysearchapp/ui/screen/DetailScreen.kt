@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,23 +25,25 @@ import com.example.companysearchapp.LoadState
 import com.example.companysearchapp.R
 import com.example.companysearchapp.ui.item.AsyncImageItem
 import com.example.companysearchapp.ui.item.ImagePagerItem
+import com.example.companysearchapp.ui.item.LinkItem
 import com.example.companysearchapp.ui.theme.CompanySearchAppTheme
 
 @Composable
 internal fun DetailScreen(
     uiState: DetailUiState,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onClickLinkItem: (String) -> Unit
 ) {
-    when(uiState.detailLoadState) {
+    when (uiState.detailLoadState) {
         is LoadState.Loading -> LinearProgressIndicator()
         is LoadState.Success -> {
             val company = uiState.detailLoadState.data
-            
+
             Column(
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_8dp)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_12dp)),
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                Box{
+                Box {
                     ImagePagerItem(
                         imageList = company.companyImageUrl
                     )
@@ -48,36 +51,62 @@ internal fun DetailScreen(
                         imgUrl = company.logoUrl.thumbnail,
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
-                            .offset(y = 30.dp)
+                            .offset(y = 40.dp)
                             .align(Alignment.BottomStart)
                             .padding(start = dimensionResource(R.dimen.padding_24dp))
-                            .size(60.dp)
+                            .size(80.dp)
+                            .clip(
+                                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_8dp))
+                            )
                             .border(
-                                width = 1.dp,
+                                width = dimensionResource(R.dimen.width_1dp),
                                 shape = RoundedCornerShape(dimensionResource(R.dimen.radius_8dp)),
                                 color = CompanySearchAppTheme.colors.lightGray
                             )
+
                     )
                 }
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_12dp)),
-                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_24dp))
+                    modifier = Modifier.padding(
+                        vertical = 50.dp + dimensionResource(R.dimen.padding_24dp),
+                        horizontal = dimensionResource(R.dimen.padding_24dp)
+                    )
                 ) {
 
                     Text(
                         text = company.title,
                         style = CompanySearchAppTheme.typography.heading20,
+                        color = CompanySearchAppTheme.colors.gray,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = company.description,
-                        style = CompanySearchAppTheme.typography.body16
+                        style = CompanySearchAppTheme.typography.body16,
+                        color = CompanySearchAppTheme.colors.lightGray,
                     )
+
+                    if (company.link.isNotEmpty()) {
+                        LinkItem(
+                            strRes = R.string.str_link,
+                            link = company.link,
+                            onClickLinkItem = onClickLinkItem
+                        )
+                    }
+
+                    if (company.url.isNotEmpty()) {
+                        LinkItem(
+                            strRes = R.string.str_url,
+                            link = company.url,
+                            onClickLinkItem = onClickLinkItem
+                        )
+                    }
                 }
             }
         }
+
         is LoadState.Error -> {
             ErrorScreen(
                 errorMessage = uiState.detailLoadState.error.message.toString(),

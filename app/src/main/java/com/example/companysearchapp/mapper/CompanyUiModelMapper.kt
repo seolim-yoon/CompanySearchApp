@@ -55,6 +55,7 @@ class CompanyUiModelMapper @Inject constructor() {
                 title = name,
                 description = description,
                 companyImageUrl = mapToCompanyImages(images),
+                link = link,
                 url = url
             )
         }

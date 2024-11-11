@@ -37,7 +37,10 @@ internal fun CompanyItem(
             .clickable {
                 onClickCompanyItem(company)
             }
-            .padding(dimensionResource(R.dimen.padding_12dp))
+            .padding(
+                horizontal = dimensionResource(R.dimen.padding_12dp),
+                vertical = dimensionResource(R.dimen.padding_16dp)
+            )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

@@ -1,7 +1,10 @@
 package com.example.companysearchapp.ui.screen
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -17,6 +20,7 @@ internal fun NavHostScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
     detailViewModel: DetailViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val navController = rememberNavController()
     val mainUiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val detailUiState by detailViewModel.uiState.collectAsStateWithLifecycle()
@@ -29,14 +33,12 @@ internal fun NavHostScreen(
             MainScreen(
                 uiState = mainUiState,
                 onSearchCompany = { keyword ->
-                    mainViewModel.onEvent(UiEvent.SearchCompany(keyword))
+                    mainViewModel.onEvent(UiEvent.SearchCompany(keyword = keyword))
                 },
                 onClickCompanyItem = { company ->
                     detailViewModel.onEvent(UiEvent.RequestDetailInfo(companyId = company.id))
                     navController.navigate(
-                        ScreenType.DetailScreen(
-                            companyId = company.id
-                        )
+                        ScreenType.DetailScreen
                     )
                 },
                 loadMoreItem = { mainViewModel.onEvent(UiEvent.LoadMore) },
@@ -46,7 +48,10 @@ internal fun NavHostScreen(
         composable<ScreenType.DetailScreen> {
             DetailScreen(
                 uiState = detailUiState,
-                onRefresh = { } // TODO : refresh
+                onRefresh = { }, // TODO : refresh
+                onClickLinkItem = { url ->
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                }
             )
         }
     }
