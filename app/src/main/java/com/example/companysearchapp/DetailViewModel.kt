@@ -1,8 +1,11 @@
 package com.example.companysearchapp
 
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.toRoute
 import com.example.companysearchapp.base.BaseViewModel
 import com.example.companysearchapp.base.UiState
 import com.example.companysearchapp.mapper.CompanyUiModelMapper
+import com.example.companysearchapp.util.Route
 import com.example.domain.usecase.GetCompanyDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -13,9 +16,18 @@ data class DetailUiState(
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val getCompanyDetailUseCase: GetCompanyDetailUseCase,
     private val companyUiModelMapper: CompanyUiModelMapper
 ): BaseViewModel<DetailUiState>() {
+    private var currentCompanyId = 0
+
+    init {
+        getCompanyDetailInfo(
+            companyId = savedStateHandle.toRoute<Route.Detail>().companyId
+        )
+    }
+
     override fun createInitialState(): DetailUiState = DetailUiState()
 
     private fun getCompanyDetailInfo(companyId: Int) {
@@ -23,6 +35,7 @@ class DetailViewModel @Inject constructor(
             copy(detailLoadState = LoadState.Loading)
         }
         viewModelLaunch(onSuccess = {
+            currentCompanyId = companyId
             val detailInfo = companyUiModelMapper.mapToDetailCompanyUiModel(
                 getCompanyDetailUseCase(
                     companyId = companyId
@@ -51,11 +64,9 @@ class DetailViewModel @Inject constructor(
         when (event) {
             is UiEvent.SearchCompany -> {}
 
-            is UiEvent.Refresh -> {}
+            is UiEvent.Refresh -> getCompanyDetailInfo(currentCompanyId)
 
             is UiEvent.LoadMore -> {}
-
-            is UiEvent.RequestDetailInfo -> getCompanyDetailInfo(event.companyId)
         }
     }
 }

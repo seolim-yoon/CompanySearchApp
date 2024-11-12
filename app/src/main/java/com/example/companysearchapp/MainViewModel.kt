@@ -106,11 +106,9 @@ class MainViewModel @Inject constructor(
         when (event) {
             is UiEvent.SearchCompany -> searchCompanyByKeyword(keyword = event.keyword)
 
-            is UiEvent.Refresh -> {}
+            is UiEvent.Refresh -> searchCompanyByKeyword(keyword = currentKeyword)
 
             is UiEvent.LoadMore -> loadMoreCompanyList(++currentPage)
-
-            is UiEvent.RequestDetailInfo -> {}
         }
     }
 }

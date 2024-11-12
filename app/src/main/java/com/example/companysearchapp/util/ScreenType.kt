@@ -2,10 +2,12 @@ package com.example.companysearchapp.util
 
 import kotlinx.serialization.Serializable
 
-sealed interface ScreenType {
+sealed interface Route {
     @Serializable
-    data object MainScreen: ScreenType
+    data object Main: Route
 
     @Serializable
-    data object DetailScreen: ScreenType
+    data class Detail(
+        val companyId: Int
+    ): Route
 }
