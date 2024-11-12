@@ -31,6 +31,7 @@ class MainViewModel @Inject constructor(
 ) : BaseViewModel<MainUiState>() {
 
     private var currentPage = 0
+    private var isLoadingPaging = false
 
     private val _currentKeyword: MutableStateFlow<String> = MutableStateFlow("")
     val currentKeyword = _currentKeyword.asStateFlow()
@@ -89,11 +90,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun loadMoreCompanyList(page: Int) {
+    private fun loadMoreCompanyList() {
+        if (isLoadingPaging) return
+
         viewModelLaunch(onSuccess = {
+            isLoadingPaging = true
             searchCompanyUseCase(
                 keyword = _currentKeyword.value,
-                offset = page * PAGE_SIZE,
+                offset = (++currentPage) * PAGE_SIZE,
                 limit = PAGE_SIZE
             ).collect { result ->
                 val loadMoreResult = companyUiModelMapper.mapToCompanyListUiModel(result)
@@ -110,6 +114,7 @@ class MainViewModel @Inject constructor(
                         )
                     } ?: currentState
                 }
+                isLoadingPaging = false
             }
         })
     }
@@ -128,7 +133,7 @@ class MainViewModel @Inject constructor(
 
             is UiEvent.Refresh -> searchCompanyByKeyword()
 
-            is UiEvent.LoadMore -> loadMoreCompanyList(++currentPage)
+            is UiEvent.LoadMore -> loadMoreCompanyList()
         }
     }
 }
