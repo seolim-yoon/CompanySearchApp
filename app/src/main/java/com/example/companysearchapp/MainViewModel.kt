@@ -5,8 +5,18 @@ import com.example.companysearchapp.base.UiState
 import com.example.companysearchapp.mapper.CompanyUiModelMapper
 import com.example.companysearchapp.uimodel.CompanyUiModel
 import com.example.companysearchapp.util.PAGE_SIZE
+import com.example.companysearchapp.util.SEARCH_TIME_DELAY
 import com.example.domain.usecase.SearchCompanyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 data class MainUiState(
@@ -21,46 +31,59 @@ class MainViewModel @Inject constructor(
 ) : BaseViewModel<MainUiState>() {
 
     private var currentPage = 0
-    private var currentKeyword = ""
+
+    private val _currentKeyword: MutableStateFlow<String> = MutableStateFlow("")
+    val currentKeyword = _currentKeyword.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    private val searchResult = _currentKeyword
+        .debounce(SEARCH_TIME_DELAY)
+        .distinctUntilChanged()
+        .filter { it.isNotEmpty() }
+        .flatMapLatest { keyword ->
+            setState {
+                copy(mainLoadState = LoadState.Loading)
+            }
+            searchCompanyUseCase(
+                keyword = keyword,
+                offset = 0,
+                limit = PAGE_SIZE
+            )
+        }
+
+    init {
+        searchCompanyByKeyword()
+    }
 
     override fun createInitialState(): MainUiState = MainUiState()
 
-    private fun searchCompanyByKeyword(
-        keyword: String
-    ) {
-        setState {
-            copy(mainLoadState = LoadState.Loading)
-        }
-        if (keyword.isNotEmpty()) {
-            viewModelLaunch(onSuccess = {
-                currentPage = 0
-                currentKeyword = keyword
-
-                val searchResult = companyUiModelMapper.mapToCompanyListUiModel(
-                    searchCompanyUseCase(
-                        keyword = keyword,
-                        offset = currentPage * PAGE_SIZE,
-                        limit = PAGE_SIZE
-                    )
-                )
-
-                setState {
-                    copy(
-                        isEnd = searchResult.next.isEmpty(),
-                        mainLoadState = LoadState.Success(
-                            mutableListOf<CompanyUiModel>().apply {
-                                addAll(searchResult.companyList)
-                            }
+    private fun searchCompanyByKeyword() {
+        viewModelLaunch(onSuccess = {
+            searchResult
+                .collect { result ->
+                    val searchResult = companyUiModelMapper.mapToCompanyListUiModel(result)
+                    setState {
+                        copy(
+                            isEnd = searchResult.next.isEmpty(),
+                            mainLoadState = LoadState.Success(
+                                mutableListOf<CompanyUiModel>().apply {
+                                    addAll(searchResult.companyList)
+                                }
+                            )
                         )
-                    )
+                    }
                 }
-            })
-        } else {
+        })
+    }
+
+    private fun inputSearchKeyword(keyword: String) {
+        currentPage = 0
+        _currentKeyword.update { keyword }
+
+        if (keyword.isEmpty()) {
             setState {
                 copy(
-                    mainLoadState = LoadState.Success(
-                        emptyList()
-                    )
+                    mainLoadState = LoadState.Success(emptyList())
                 )
             }
         }
@@ -68,16 +91,13 @@ class MainViewModel @Inject constructor(
 
     private fun loadMoreCompanyList(page: Int) {
         viewModelLaunch(onSuccess = {
+            searchCompanyUseCase(
+                keyword = _currentKeyword.value,
+                offset = page * PAGE_SIZE,
+                limit = PAGE_SIZE
+            ).collect { result ->
+                val loadMoreResult = companyUiModelMapper.mapToCompanyListUiModel(result)
 
-            val loadMoreResult = companyUiModelMapper.mapToCompanyListUiModel(
-                searchCompanyUseCase(
-                    keyword = currentKeyword,
-                    offset = page * PAGE_SIZE,
-                    limit = PAGE_SIZE
-                )
-            )
-
-            if (loadMoreResult.companyList.isNotEmpty()) {
                 setState {
                     (currentState.mainLoadState as? LoadState.Success)?.let { successState ->
                         copy(
@@ -104,9 +124,9 @@ class MainViewModel @Inject constructor(
 
     override fun onEvent(event: UiEvent) {
         when (event) {
-            is UiEvent.SearchCompany -> searchCompanyByKeyword(keyword = event.keyword)
+            is UiEvent.InputKeyword -> inputSearchKeyword(event.keyword)
 
-            is UiEvent.Refresh -> searchCompanyByKeyword(keyword = currentKeyword)
+            is UiEvent.Refresh -> searchCompanyByKeyword()
 
             is UiEvent.LoadMore -> loadMoreCompanyList(++currentPage)
         }

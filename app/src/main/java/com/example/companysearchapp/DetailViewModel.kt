@@ -62,7 +62,7 @@ class DetailViewModel @Inject constructor(
 
     override fun onEvent(event: UiEvent) {
         when (event) {
-            is UiEvent.SearchCompany -> {}
+            is UiEvent.InputKeyword -> {}
 
             is UiEvent.Refresh -> getCompanyDetailInfo(currentCompanyId)
 

@@ -7,12 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,9 +21,6 @@ import com.example.companysearchapp.ui.item.CompanyListItem
 import com.example.companysearchapp.ui.item.EmptyScreen
 import com.example.companysearchapp.ui.item.SearchBarItem
 import com.example.companysearchapp.uimodel.CompanyUiModel
-import com.example.companysearchapp.util.SEARCH_TIME_DELAY
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 internal fun MainRoute(
@@ -36,6 +28,7 @@ internal fun MainRoute(
     onClickCompanyItem: (CompanyUiModel) -> Unit,
 ) {
     val mainUiState by mainViewModel.uiState.collectAsStateWithLifecycle()
+    val keyword by mainViewModel.currentKeyword.collectAsStateWithLifecycle()
 
     Scaffold { innerPadding ->
         Column(
@@ -44,7 +37,9 @@ internal fun MainRoute(
         ) {
             MainScreen(
                 uiState = mainUiState,
-                onSearchCompany = { keyword -> mainViewModel.onEvent(UiEvent.SearchCompany(keyword = keyword)) },
+                keyword = keyword,
+                onValueChange = { mainViewModel.onEvent(UiEvent.InputKeyword(it)) },
+                onClickClearBtn = { mainViewModel.onEvent(UiEvent.InputKeyword("")) },
                 onClickCompanyItem = onClickCompanyItem,
                 loadMoreItem = { mainViewModel.onEvent(UiEvent.LoadMore) },
                 onRefresh = { mainViewModel.onEvent(UiEvent.Refresh) }
@@ -56,31 +51,17 @@ internal fun MainRoute(
 @Composable
 internal fun MainScreen(
     uiState: MainUiState,
-    onSearchCompany: (String) -> Unit,
+    keyword: String,
+    onValueChange: (String) -> Unit,
+    onClickClearBtn: () -> Unit,
     onClickCompanyItem: (CompanyUiModel) -> Unit,
     loadMoreItem: () -> Unit,
     onRefresh: () -> Unit
 ) {
-    var keyword by rememberSaveable { mutableStateOf("") }
-
-    LaunchedEffect(key1 = true) {
-        snapshotFlow { keyword }
-            .debounce(SEARCH_TIME_DELAY)
-            .distinctUntilChanged()
-            .collect { keyword ->
-                onSearchCompany(keyword)
-            }
-    }
-
     SearchBarItem(
         keyword = keyword,
-        onValueChange = {
-            keyword = it
-        },
-        onClickClearBtn = {
-            keyword = ""
-            onSearchCompany(keyword)
-        }
+        onValueChange = onValueChange,
+        onClickClearBtn = onClickClearBtn
     )
 
     when (uiState.mainLoadState) {

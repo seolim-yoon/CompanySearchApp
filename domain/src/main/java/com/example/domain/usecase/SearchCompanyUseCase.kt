@@ -2,6 +2,7 @@ package com.example.domain.usecase
 
 import com.example.domain.entity.CompanyListEntity
 import com.example.domain.repository.CompanyRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class SearchCompanyUseCase @Inject constructor(
@@ -11,7 +12,7 @@ class SearchCompanyUseCase @Inject constructor(
         keyword: String,
         offset: Int,
         limit: Int
-    ): CompanyListEntity =
+    ): Flow<CompanyListEntity> =
         companyRepository.searchCompany(
             keyword = keyword,
             offset = offset,
