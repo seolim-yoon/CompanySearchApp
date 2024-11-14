@@ -44,7 +44,7 @@ internal fun DetailRoute(
         is LoadState.Loading -> LinearProgressIndicator()
         is LoadState.Success -> {
             DetailScreen(
-                company = (detailUiState.detailLoadState as LoadState.Success).data,
+                company = detailUiState.detailCompany,
                 onClickLinkItem = onClickLinkItem
             )
         }

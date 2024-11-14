@@ -6,3 +6,4 @@ const val IMAGE_AUTO_SWIPE = 3000L
 const val SEARCH_TIME_DELAY = 500L
 
 const val LINK_URL = "LINK_URL"
+const val COMPANY_INFO_TYPE = "CompanyInfoType"

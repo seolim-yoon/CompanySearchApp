@@ -71,10 +71,10 @@ internal fun MainScreen(
             )
         }
         is LoadState.Success -> {
-            if (uiState.mainLoadState.data.isNotEmpty()) {
+            if (uiState.companyList.isNotEmpty()) {
                 CompanyListItem(
                     isEnd = uiState.isEnd,
-                    companyList = uiState.mainLoadState.data,
+                    companyList = uiState.companyList,
                     onClickCompanyItem = onClickCompanyItem,
                     loadMoreItem = loadMoreItem
                 )

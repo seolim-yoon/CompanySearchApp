@@ -6,15 +6,16 @@ import com.example.companysearchapp.base.BaseViewModel
 import com.example.companysearchapp.base.UiState
 import com.example.companysearchapp.mapper.CompanyUiModelMapper
 import com.example.companysearchapp.ui.event.UiEvent
-import com.example.companysearchapp.ui.state.DetailLoadState
 import com.example.companysearchapp.ui.state.LoadState
+import com.example.companysearchapp.uimodel.DetailCompanyUiModel
 import com.example.companysearchapp.util.Route
 import com.example.domain.usecase.GetCompanyDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 data class DetailUiState(
-    val detailLoadState: DetailLoadState = LoadState.Loading
+    val detailCompany: DetailCompanyUiModel = DetailCompanyUiModel(),
+    val detailLoadState: LoadState = LoadState.Loading
 ): UiState
 
 @HiltViewModel
@@ -47,9 +48,8 @@ class DetailViewModel @Inject constructor(
 
             setState {
                 copy(
-                    detailLoadState = LoadState.Success(
-                        detailInfo
-                    )
+                    detailCompany = detailInfo,
+                    detailLoadState = LoadState.Success
                 )
             }
         })

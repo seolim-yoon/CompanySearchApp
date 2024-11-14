@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.companysearchapp.R
 import com.example.companysearchapp.ui.theme.CompanySearchAppTheme
 import com.example.companysearchapp.uimodel.CompanyUiModel
+import com.example.companysearchapp.util.COMPANY_INFO_TYPE
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -55,6 +56,7 @@ internal fun CompanyListItem(
         ) {
             items(
                 key = { it.id },
+                contentType = { COMPANY_INFO_TYPE },
                 items = companyList
             ) { company ->
                 CompanyItem(

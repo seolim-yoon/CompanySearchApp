@@ -5,7 +5,6 @@ import com.example.companysearchapp.base.UiState
 import com.example.companysearchapp.mapper.CompanyUiModelMapper
 import com.example.companysearchapp.ui.event.UiEvent
 import com.example.companysearchapp.ui.state.LoadState
-import com.example.companysearchapp.ui.state.MainLoadState
 import com.example.companysearchapp.uimodel.CompanyUiModel
 import com.example.companysearchapp.util.PAGE_SIZE
 import com.example.companysearchapp.util.SEARCH_TIME_DELAY
@@ -24,7 +23,8 @@ import javax.inject.Inject
 
 data class MainUiState(
     val isEnd: Boolean = false,
-    val mainLoadState: MainLoadState = LoadState.Success(listOf())
+    val companyList: List<CompanyUiModel> = listOf(),
+    val mainLoadState: LoadState = LoadState.Success
 ) : UiState
 
 @HiltViewModel
@@ -56,27 +56,38 @@ class MainViewModel @Inject constructor(
         }
 
     init {
-        searchCompanyByKeyword()
+        searchCompanyByKeyword(isLoadMore = false)
     }
 
     override fun createInitialState(): MainUiState = MainUiState()
 
-    private fun searchCompanyByKeyword() {
+    private fun searchCompanyByKeyword(isLoadMore: Boolean) {
+        if (isLoadingPaging) return
+
         viewModelLaunch(onSuccess = {
-            searchResult
-                .collect { result ->
-                    val searchResult = companyUiModelMapper.mapToCompanyListUiModel(result)
-                    setState {
-                        copy(
-                            isEnd = searchResult.next.isEmpty(),
-                            mainLoadState = LoadState.Success(
-                                mutableListOf<CompanyUiModel>().apply {
-                                    addAll(searchResult.companyList)
-                                }
-                            )
-                        )
-                    }
+            isLoadingPaging = true
+
+            val entityResult = if (isLoadMore) searchCompanyUseCase(
+                keyword = _currentKeyword.value,
+                offset = (++currentPage) * PAGE_SIZE,
+                limit = PAGE_SIZE
+            ) else searchResult
+
+            entityResult.collect { result ->
+                val uiModelResult = companyUiModelMapper.mapToCompanyListUiModel(result)
+
+                setState {
+                    copy(
+                        isEnd = uiModelResult.next.isEmpty(),
+                        companyList = companyList.toMutableList().apply {
+                            addAll(uiModelResult.companyList)
+                        }.distinct(),
+                        mainLoadState = LoadState.Success
+                    )
                 }
+
+                isLoadingPaging = false
+            }
         })
     }
 
@@ -84,42 +95,12 @@ class MainViewModel @Inject constructor(
         currentPage = 0
         _currentKeyword.update { keyword }
 
-        if (keyword.isEmpty()) {
-            setState {
-                copy(
-                    mainLoadState = LoadState.Success(emptyList())
-                )
-            }
+        setState {
+            copy(
+                companyList = listOf(),
+                mainLoadState = LoadState.Success
+            )
         }
-    }
-
-    private fun loadMoreCompanyList() {
-        if (isLoadingPaging) return
-
-        viewModelLaunch(onSuccess = {
-            isLoadingPaging = true
-            searchCompanyUseCase(
-                keyword = _currentKeyword.value,
-                offset = (++currentPage) * PAGE_SIZE,
-                limit = PAGE_SIZE
-            ).collect { result ->
-                val loadMoreResult = companyUiModelMapper.mapToCompanyListUiModel(result)
-
-                setState {
-                    (currentState.mainLoadState as? LoadState.Success)?.let { successState ->
-                        copy(
-                            isEnd = loadMoreResult.next.isEmpty(),
-                            mainLoadState = LoadState.Success(
-                                successState.data.toMutableList().apply {
-                                    addAll(loadMoreResult.companyList)
-                                }
-                            )
-                        )
-                    } ?: currentState
-                }
-                isLoadingPaging = false
-            }
-        })
     }
 
     override fun handleException(throwable: Throwable) {
@@ -134,9 +115,9 @@ class MainViewModel @Inject constructor(
         when (event) {
             is UiEvent.InputKeyword -> inputSearchKeyword(event.keyword)
 
-            is UiEvent.Refresh -> searchCompanyByKeyword()
+            is UiEvent.Refresh -> searchCompanyByKeyword(isLoadMore = false)
 
-            is UiEvent.LoadMore -> loadMoreCompanyList()
+            is UiEvent.LoadMore -> searchCompanyByKeyword(isLoadMore = true)
         }
     }
 }
