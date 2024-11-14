@@ -1,4 +1,4 @@
-package com.example.companysearchapp.ui.item
+package com.example.companysearchapp.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,6 +35,7 @@ internal fun EmptyScreen(
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = null,
+            tint = CompanySearchAppTheme.colors.gray,
             modifier = Modifier.size(100.dp)
         )
 
@@ -44,6 +45,7 @@ internal fun EmptyScreen(
             } else {
                 stringResource(R.string.search_place_holder)
             },
+            color = CompanySearchAppTheme.colors.gray,
             style = CompanySearchAppTheme.typography.body16,
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_16dp))
         )

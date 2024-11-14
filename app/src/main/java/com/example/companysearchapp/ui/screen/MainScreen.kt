@@ -1,5 +1,6 @@
 package com.example.companysearchapp.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,8 +19,8 @@ import com.example.companysearchapp.MainViewModel
 import com.example.companysearchapp.R
 import com.example.companysearchapp.ui.event.UiEvent
 import com.example.companysearchapp.ui.item.CompanyListItem
-import com.example.companysearchapp.ui.item.EmptyScreen
 import com.example.companysearchapp.ui.item.SearchBarItem
+import com.example.companysearchapp.ui.theme.CompanySearchAppTheme
 import com.example.companysearchapp.uimodel.CompanyUiModel
 
 @Composable
@@ -34,6 +35,9 @@ internal fun MainRoute(
         Column(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_8dp)),
             modifier = Modifier.padding(innerPadding)
+                .background(
+                    color = CompanySearchAppTheme.colors.white
+                )
         ) {
             MainScreen(
                 uiState = mainUiState,
