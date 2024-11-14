@@ -72,7 +72,8 @@ internal fun DetailScreen(
                 imageList = company.companyImageUrl
             )
             AsyncImageItem(
-                imgUrl = company.logoUrl.thumbnail,
+                thumbnailUrl = company.logoUrl.thumbnail,
+                originUrl = company.logoUrl.origin,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .offset(y = 40.dp)

@@ -51,7 +51,8 @@ internal fun ImagePagerItem(
                 .fillMaxWidth()
         ) {
             AsyncImageItem(
-                imgUrl = imageList[page].thumbnail,
+                thumbnailUrl = imageList[page].thumbnail,
+                originUrl = imageList[page].origin,
                 contentScale = ContentScale.Crop
             )
 

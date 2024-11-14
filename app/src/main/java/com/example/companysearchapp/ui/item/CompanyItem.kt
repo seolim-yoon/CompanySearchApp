@@ -48,7 +48,8 @@ internal fun CompanyItem(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_12dp)),
         ) {
             AsyncImageItem(
-                imgUrl = company.logoImg.thumbnail,
+                thumbnailUrl = company.logoImg.thumbnail,
+                originUrl = company.logoImg.origin,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(60.dp)
                     .clip(
