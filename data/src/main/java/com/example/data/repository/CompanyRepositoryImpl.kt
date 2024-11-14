@@ -1,6 +1,6 @@
 package com.example.data.repository
 
-import com.example.data.datasource.remote.CompanyRemoteDataSource
+import com.example.data.api.CompanyServiceApi
 import com.example.data.mapper.CompanyEntityMapper
 import com.example.domain.entity.CompanyDetailEntity
 import com.example.domain.entity.CompanyListEntity
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class CompanyRepositoryImpl @Inject constructor(
-    private val companyRemoteDataSource: CompanyRemoteDataSource,
+    private val companyServiceApi: CompanyServiceApi,
     private val companyEntityMapper: CompanyEntityMapper
 ) : CompanyRepository {
     override suspend fun searchCompany(
@@ -19,18 +19,20 @@ class CompanyRepositoryImpl @Inject constructor(
         limit: Int
     ): Flow<CompanyListEntity> =
         flow {
-            companyRemoteDataSource.searchCompany(
-                keyword = keyword,
-                offset = offset,
-                limit = limit
-            ).collect {
-                emit(companyEntityMapper.mapToCompanyListEntity(it))
-            }
+            emit(
+                companyEntityMapper.mapToCompanyListEntity(
+                    companyServiceApi.searchCompany(
+                        keyword = keyword,
+                        offset = offset,
+                        limit = limit
+                    )
+                )
+            )
         }
 
     override suspend fun getCompanyDetail(companyId: Int): CompanyDetailEntity =
         companyEntityMapper.mapToCompanyDetailEntity(
-            companyRemoteDataSource.getCompanyDetail(
+            companyServiceApi.getCompanyDetail(
                 companyId = companyId
             )
         )
