@@ -12,14 +12,26 @@ import javax.inject.Inject
 class CompanyRepositoryImpl @Inject constructor(
     private val companyRemoteDataSource: CompanyRemoteDataSource,
     private val companyEntityMapper: CompanyEntityMapper
-): CompanyRepository {
-    override suspend fun searchCompany(keyword: String, offset: Int, limit: Int): Flow<CompanyListEntity> =
+) : CompanyRepository {
+    override suspend fun searchCompany(
+        keyword: String,
+        offset: Int,
+        limit: Int
+    ): Flow<CompanyListEntity> =
         flow {
-            companyRemoteDataSource.searchCompany(keyword = keyword, offset = offset, limit = limit).collect {
+            companyRemoteDataSource.searchCompany(
+                keyword = keyword,
+                offset = offset,
+                limit = limit
+            ).collect {
                 emit(companyEntityMapper.mapToCompanyListEntity(it))
             }
         }
 
     override suspend fun getCompanyDetail(companyId: Int): CompanyDetailEntity =
-        companyEntityMapper.mapToCompanyDetailEntity(companyRemoteDataSource.getCompanyDetail(companyId = companyId))
+        companyEntityMapper.mapToCompanyDetailEntity(
+            companyRemoteDataSource.getCompanyDetail(
+                companyId = companyId
+            )
+        )
 }

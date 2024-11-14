@@ -12,11 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.companysearchapp.LoadState
+import com.example.companysearchapp.ui.state.LoadState
 import com.example.companysearchapp.MainUiState
 import com.example.companysearchapp.MainViewModel
 import com.example.companysearchapp.R
-import com.example.companysearchapp.UiEvent
+import com.example.companysearchapp.ui.event.UiEvent
 import com.example.companysearchapp.ui.item.CompanyListItem
 import com.example.companysearchapp.ui.item.EmptyScreen
 import com.example.companysearchapp.ui.item.SearchBarItem

@@ -2,7 +2,7 @@ package com.example.companysearchapp.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.companysearchapp.UiEvent
+import com.example.companysearchapp.ui.event.UiEvent
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

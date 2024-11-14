@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.companysearchapp.DetailViewModel
-import com.example.companysearchapp.LoadState
+import com.example.companysearchapp.ui.state.LoadState
 import com.example.companysearchapp.R
-import com.example.companysearchapp.UiEvent
+import com.example.companysearchapp.ui.event.UiEvent
 import com.example.companysearchapp.ui.item.AsyncImageItem
 import com.example.companysearchapp.ui.item.ImagePagerItem
 import com.example.companysearchapp.ui.item.LinkItem

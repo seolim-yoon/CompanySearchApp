@@ -3,6 +3,9 @@ package com.example.companysearchapp
 import com.example.companysearchapp.base.BaseViewModel
 import com.example.companysearchapp.base.UiState
 import com.example.companysearchapp.mapper.CompanyUiModelMapper
+import com.example.companysearchapp.ui.event.UiEvent
+import com.example.companysearchapp.ui.state.LoadState
+import com.example.companysearchapp.ui.state.MainLoadState
 import com.example.companysearchapp.uimodel.CompanyUiModel
 import com.example.companysearchapp.util.PAGE_SIZE
 import com.example.companysearchapp.util.SEARCH_TIME_DELAY

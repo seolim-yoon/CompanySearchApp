@@ -1,4 +1,4 @@
-package com.example.companysearchapp
+package com.example.companysearchapp.ui.state
 
 import com.example.companysearchapp.uimodel.CompanyUiModel
 import com.example.companysearchapp.uimodel.DetailCompanyUiModel

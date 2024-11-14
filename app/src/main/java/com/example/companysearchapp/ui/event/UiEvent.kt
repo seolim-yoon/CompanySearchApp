@@ -1,4 +1,4 @@
-package com.example.companysearchapp
+package com.example.companysearchapp.ui.event
 
 sealed interface UiEvent {
     data class InputKeyword(val keyword: String) : UiEvent

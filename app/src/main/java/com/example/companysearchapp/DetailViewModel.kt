@@ -5,6 +5,9 @@ import androidx.navigation.toRoute
 import com.example.companysearchapp.base.BaseViewModel
 import com.example.companysearchapp.base.UiState
 import com.example.companysearchapp.mapper.CompanyUiModelMapper
+import com.example.companysearchapp.ui.event.UiEvent
+import com.example.companysearchapp.ui.state.DetailLoadState
+import com.example.companysearchapp.ui.state.LoadState
 import com.example.companysearchapp.util.Route
 import com.example.domain.usecase.GetCompanyDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
