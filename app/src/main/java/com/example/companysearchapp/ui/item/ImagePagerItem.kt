@@ -41,29 +41,29 @@ internal fun ImagePagerItem(
             }
         }
     }
-    HorizontalPager(
-        key = { imageList[it].id },
-        state = pagerState,
-        beyondViewportPageCount = 1
-    ) { page ->
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        HorizontalPager(
+            key = { imageList[it].id },
+            state = pagerState,
+            beyondViewportPageCount = 1
+        ) { page ->
+
             AsyncImageItem(
                 thumbnailUrl = imageList[page].thumbnail,
                 originUrl = imageList[page].origin,
                 contentScale = ContentScale.Crop
             )
-
-            if (imageList.size > 1) {
-                BannerIndicator(
-                    currentIdx = page + 1,
-                    totalCount = imageList.size,
-                    modifier = Modifier.align(Alignment.BottomEnd)
-                        .padding(dimensionResource(R.dimen.padding_16dp))
-                )
-            }
+        }
+        if (imageList.size > 1) {
+            BannerIndicator(
+                currentIdx = pagerState.currentPage + 1,
+                totalCount = imageList.size,
+                modifier = Modifier.align(Alignment.BottomEnd)
+                    .padding(dimensionResource(R.dimen.padding_16dp))
+            )
         }
     }
 }
@@ -84,7 +84,8 @@ internal fun BannerIndicator(
                 shape = RoundedCornerShape(dimensionResource(R.dimen.radius_8dp))
             )
             .padding
-                (vertical = dimensionResource(R.dimen.padding_4dp),
+                (
+                vertical = dimensionResource(R.dimen.padding_4dp),
                 horizontal = dimensionResource(R.dimen.padding_8dp)
             )
     )
