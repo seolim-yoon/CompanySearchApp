@@ -97,8 +97,7 @@ class MainViewModel @Inject constructor(
 
         setState {
             copy(
-                companyList = listOf(),
-                mainLoadState = LoadState.Success
+                companyList = listOf()
             )
         }
     }
@@ -109,6 +108,7 @@ class MainViewModel @Inject constructor(
                 mainLoadState = LoadState.Error(throwable)
             )
         }
+        isLoadingPaging = false
     }
 
     override fun onEvent(event: UiEvent) {
