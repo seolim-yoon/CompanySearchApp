@@ -8,6 +8,7 @@ import com.example.companysearchapp.ui.state.LoadState
 import com.example.companysearchapp.uimodel.CompanyUiModel
 import com.example.companysearchapp.util.PAGE_SIZE
 import com.example.companysearchapp.util.SEARCH_TIME_DELAY
+import com.example.domain.entity.CompanyListEntity
 import com.example.domain.usecase.SearchCompanyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,39 +57,51 @@ class MainViewModel @Inject constructor(
         }
 
     init {
-        searchCompanyByKeyword(isLoadMore = false)
+        searchCompanyByKeyword()
     }
 
     override fun createInitialState(): MainUiState = MainUiState()
 
-    private fun searchCompanyByKeyword(isLoadMore: Boolean) {
+    private fun searchCompanyByKeyword() {
+        viewModelLaunch(onSuccess = {
+            searchResult.collect { result ->
+                updateCompanyList(result)
+            }
+        })
+    }
+
+    private fun loadMoreCompany() {
         if (isLoadingPaging) return
 
         viewModelLaunch(onSuccess = {
             isLoadingPaging = true
 
-            val entityResult = if (isLoadMore) searchCompanyUseCase(
+            val entityResult = searchCompanyUseCase(
                 keyword = _currentKeyword.value,
                 offset = (++currentPage) * PAGE_SIZE,
                 limit = PAGE_SIZE
-            ) else searchResult
+            )
 
             entityResult.collect { result ->
-                val uiModelResult = companyUiModelMapper.mapToCompanyListUiModel(result)
-
-                setState {
-                    copy(
-                        isEnd = uiModelResult.next.isEmpty(),
-                        companyList = companyList.toMutableList().apply {
-                            addAll(uiModelResult.companyList)
-                        }.distinct(),
-                        mainLoadState = LoadState.Success
-                    )
-                }
-
+                updateCompanyList(result)
                 isLoadingPaging = false
             }
         })
+    }
+
+
+    private fun updateCompanyList(result: CompanyListEntity) {
+        val uiModelResult = companyUiModelMapper.mapToCompanyListUiModel(result)
+
+        setState {
+            copy(
+                isEnd = uiModelResult.next.isEmpty(),
+                companyList = companyList.toMutableList().apply {
+                    addAll(uiModelResult.companyList)
+                }.distinct(),
+                mainLoadState = LoadState.Success
+            )
+        }
     }
 
     private fun inputSearchKeyword(keyword: String) {
@@ -115,9 +128,9 @@ class MainViewModel @Inject constructor(
         when (event) {
             is UiEvent.InputKeyword -> inputSearchKeyword(event.keyword)
 
-            is UiEvent.Refresh -> searchCompanyByKeyword(isLoadMore = false)
+            is UiEvent.Refresh -> searchCompanyByKeyword()
 
-            is UiEvent.LoadMore -> searchCompanyByKeyword(isLoadMore = true)
+            is UiEvent.LoadMore -> loadMoreCompany()
         }
     }
 }
