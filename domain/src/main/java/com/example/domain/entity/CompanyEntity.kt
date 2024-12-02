@@ -10,28 +10,28 @@ data class CompanyListEntity(
 }
 
 data class CompanyDetailEntity(
-    val company: CompanyEntity = CompanyEntity()
+    val company: CompanyEntity
 )
 
 data class CompanyEntity(
-    val id: Int = 0,
-    val name: String = "",
-    val url: String = "",
-    val description: String = "",
+    val id: Int,
+    val name: String,
+    val url: String,
+    val description: String,
     // company
-    val logoImg: ImageEntity = ImageEntity(),
-    val titleImg: ImageEntity = ImageEntity(),
+    val logoImg: ImageEntity,
+    val titleImg: ImageEntity,
     // detail
-    val companyConfirm: Boolean = false,
-    val images: List<ImageEntity> = listOf(),
-    val link: String = "",
-    val logoUrl: ImageEntity = ImageEntity(),
-    val registrationNumber: String = "",
+    val companyConfirm: Boolean,
+    val images: List<ImageEntity>,
+    val link: String,
+    val logoUrl: ImageEntity,
+    val registrationNumber: String,
 ) {
     data class ImageEntity(
-        val id: Int = 0,
-        val isTitle: Boolean = false,
-        val origin: String = "",
-        val thumb: String = ""
+        val id: Int,
+        val isTitle: Boolean,
+        val origin: String,
+        val thumb: String
     )
 }

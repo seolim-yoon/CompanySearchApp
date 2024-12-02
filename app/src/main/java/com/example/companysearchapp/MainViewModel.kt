@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -46,14 +47,17 @@ class MainViewModel @Inject constructor(
         .distinctUntilChanged()
         .filter { it.isNotEmpty() }
         .flatMapLatest { keyword ->
-            setState {
-                copy(mainLoadState = LoadState.Loading)
+            flow {
+                setState {
+                    copy(mainLoadState = LoadState.Loading)
+                }
+                val result = searchCompanyUseCase(
+                    keyword = keyword,
+                    offset = 0,
+                    limit = PAGE_SIZE
+                )
+                emit(result)
             }
-            searchCompanyUseCase(
-                keyword = keyword,
-                offset = 0,
-                limit = PAGE_SIZE
-            )
         }
 
     init {
@@ -81,11 +85,8 @@ class MainViewModel @Inject constructor(
                 offset = (++currentPage) * PAGE_SIZE,
                 limit = PAGE_SIZE
             )
-
-            entityResult.collect { result ->
-                updateCompanyList(result)
-                isLoadingPaging = false
-            }
+            updateCompanyList(entityResult)
+            isLoadingPaging = false
         })
     }
 
